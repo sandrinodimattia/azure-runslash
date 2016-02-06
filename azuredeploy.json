@@ -49,10 +49,10 @@
     "storageAccountType":{
       "type":"string",
       "allowedValues":[
-        "Standard-LRS",
-        "Standard-GRS",
-        "Standard-RAGRS",
-        "Standard-ZRS"
+        "Standard_LRS",
+        "Standard_GRS",
+        "Standard_RAGRS",
+        "Standard_ZRS"
       ],
       "metadata":{
         "description": "Type of storage account"
@@ -177,7 +177,7 @@
           "name":"web",
           "type":"config",
           "dependsOn":[
-            "[concat('Microsoft.Web/Sites/', parameters('deploySiteName'))]"
+            "[concat('Microsoft.Web/Sites/', variables('deploySiteName'))]"
           ],
           "properties":{
             "phpVersion": "off",
@@ -201,7 +201,7 @@
             "RESOURCE_GROUP": "[parameters('RESOURCE_GROUP')]",
             "AUTOMATION_ACCOUNT": "[parameters('AUTOMATION_ACCOUNT')]",
             "STORAGE_ACCOUNT": "[concat('https://', parameters('storageName'), '.blob.core.windows.net')]",
-            "STORAGE_ACCOUNT_KEY": "[listKeys(concat('Microsoft.ClassicStorage/storageAccounts/', parameters('storageName')), '2014-06-01').primaryKey]",
+            "STORAGE_ACCOUNT_KEY": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageName')), '2015-06-15').key1]",
             "SLACK_TOKEN": "[parameters('SLACK_TOKEN')]",
             "SLACK_INCOMING_WEBHOOK_URL": "[parameters('SLACK_INCOMING_WEBHOOK_URL')]",
             "WEBSITE_NODE_DEFAULT_VERSION": "5.3.0"
