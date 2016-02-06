@@ -1,0 +1,213 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "siteName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of Azure Web App"
+      }
+    },
+    "appServicePlanName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of new or existing App Service Plan"
+      }
+    },
+    "siteLocation": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the Location (eg: West Europe)"
+      }
+    },
+    "sku": {
+      "type": "string",
+      "defaultValue": "Free",
+      "allowedValues": [
+          "Free",
+          "Basic",
+          "Standard",
+          "Premium"
+      ],
+      "metadata": {
+          "description": "The pricing tier for the App Service plan."
+      }
+    },
+    "svcPlanSize": {
+      "defaultValue": "F1",
+      "type": "string",
+      "metadata": {
+          "description": "The instance size of the app."
+      }
+    },
+    "storageName":{
+      "type":"string",
+      "metadata": {
+        "description":"Name of your Storage Account"
+      }
+    },
+    "storageAccountType":{
+      "type":"string",
+      "allowedValues":[
+        "Standard-LRS",
+        "Standard-GRS",
+        "Standard-RAGRS",
+        "Standard-ZRS"
+      ],
+      "metadata":{
+        "description": "Type of storage account"
+      }
+    },
+    "repoURL": {
+      "type": "string",
+      "defaultValue": "https://github.com/sandrinodimattia/azure-runslash.git",
+      "metadata": {
+        "description": "The URL for the GitHub repository that contains the project to deploy."
+      }
+    },
+    "branch": {
+      "type": "string",
+      "defaultValue": "master",
+      "metadata": {
+        "description": "The branch of the GitHub repository to use."
+      }
+    },
+    "SUBSCRIPTION_ID" : {
+      "type": "string",
+      "metadata": {
+        "description": "Your Azure subscription ID"
+      }
+    },
+    "TENANT_ID" : {
+      "type": "string",
+      "metadata": {
+        "description": "Your Azure AD tenant ID (used for authentication)."
+      }
+    },
+    "CLIENT_ID" : {
+      "type": "string",
+      "metadata": {
+        "description": "Your Azure AD client ID (used for authentication)."
+      }
+    },
+    "CLIENT_SECRET" : {
+      "type": "string",
+      "metadata": {
+        "description": "Your Azure AD client secret or service principal password (used for authentication)."
+      }
+    },
+    "RESOURCE_GROUP" : {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the Resource Group in which your Automation account lives."
+      }
+    },
+    "AUTOMATION_ACCOUNT" : {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the Automation account in which you want to execute Runbooks."
+      }
+    },
+    "SLACK_TOKEN" : {
+      "type": "string",
+      "metadata": {
+        "description": "The Slack token of your slash command."
+      }
+    },
+    "SLACK_INCOMING_WEBHOOK_URL" : {
+      "type": "string",
+      "metadata": {
+        "description": "URL of your Incoming Webhook."
+      }
+    }
+  },
+  "variables": {
+    "deploySiteName": "[parameters('siteName')]"
+  },
+  "resources": [
+    {
+      "apiVersion":"2015-06-15",
+      "type":"Microsoft.Storage/storageAccounts",
+      "name":"[parameters('storageName')]",
+      "location":"[parameters('siteLocation')]",
+      "properties":{
+        "accountType":"[parameters('storageAccountType')]"
+      }
+    },
+    {
+      "apiVersion": "2015-08-01",
+      "name": "[parameters('appServicePlanName')]",
+      "type": "Microsoft.Web/serverfarms",
+      "location": "[parameters('siteLocation')]",        
+      "sku": {
+        "name": "[parameters('svcPlanSize')]",
+        "tier": "[parameters('sku')]",
+        "capacity": 1
+      }
+    },
+    {
+      "apiVersion": "2015-08-01",
+      "name": "[variables('deploySiteName')]",
+      "type": "Microsoft.Web/sites",
+      "location": "[parameters('siteLocation')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageName'))]"
+      ],
+      "properties": {
+        "name": "[variables('deploySiteName')]",
+        "serverFarmId": "[parameters('appServicePlanName')]"
+      },
+      "resources": [
+        {
+          "apiVersion": "2015-08-01",
+          "name": "web",
+          "type": "sourcecontrols",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/Sites', variables('deploySiteName'))]"
+          ],
+          "properties": {
+            "RepoUrl": "[parameters('repoURL')]",
+            "branch": "[parameters('branch')]",
+            "IsManualIntegration": true
+          }
+        },
+        {
+          "apiVersion": "2015-08-01",
+          "name":"web",
+          "type":"config",
+          "dependsOn":[
+            "[concat('Microsoft.Web/Sites/', parameters('deploySiteName'))]"
+          ],
+          "properties":{
+            "phpVersion": "off",
+            "alwaysOn": true,
+            "httpLoggingEnabled": true,
+            "logsDirectorySizeLimit": 40
+          }
+        },
+        {
+          "apiVersion": "2015-08-01",
+          "name": "appsettings",
+          "type": "config",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/Sites', variables('deploySiteName'))]"
+          ],
+          "properties": {
+            "SUBSCRIPTION_ID": "[parameters('SUBSCRIPTION_ID')]",
+            "TENANT_ID": "[parameters('TENANT_ID')]",
+            "CLIENT_ID": "[parameters('CLIENT_ID')]",
+            "CLIENT_SECRET": "[parameters('CLIENT_SECRET')]",
+            "RESOURCE_GROUP": "[parameters('RESOURCE_GROUP')]",
+            "AUTOMATION_ACCOUNT": "[parameters('AUTOMATION_ACCOUNT')]",
+            "STORAGE_ACCOUNT": "[concat('https://', parameters('storageName'), '.blob.core.windows.net')]",
+            "STORAGE_ACCOUNT_KEY": "[listKeys(concat('Microsoft.ClassicStorage/storageAccounts/', parameters('storageName')), '2014-06-01').primaryKey]",
+            "SLACK_TOKEN": "[parameters('SLACK_TOKEN')]",
+            "SLACK_INCOMING_WEBHOOK_URL": "[parameters('SLACK_INCOMING_WEBHOOK_URL')]",
+            "WEBSITE_NODE_DEFAULT_VERSION": "5.3.0"
+          }
+        }
+      ]
+    }
+  ]
+}

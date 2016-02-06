@@ -1,0 +1,24 @@
+{
+  "name": "azure-runslash",
+  "version": "1.0.0",
+  "description": "A chatops tool that allows you to run Azure Automation Runbooks from Slack and get notified of the progress.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "armclient": "^1.1.0",
+    "async": "^1.5.2",
+    "azure-storage": "^0.8.0",
+    "bluebird": "^3.2.2",
+    "express": "^4.13.4",
+    "morgan": "^1.6.1",
+    "nconf": "^0.8.4",
+    "node-slackr": "^0.1.2",
+    "node-uuid": "^1.4.7",
+    "request": "^2.69.0",
+    "winston": "^2.1.1"
+  }
+}
