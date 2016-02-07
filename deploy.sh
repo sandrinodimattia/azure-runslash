@@ -140,6 +140,10 @@ if [ -e "$DEPLOYMENT_TARGET/package.json" ]; then
   cd - > /dev/null
 fi
 
+# 4. Restart Web Job
+find run.js -exec echo "Touching for Web Job restart:" {} \;
+find run.js -exec touch {} \;
+
 ##################################################################################################################################
 
 # Post deployment stub
