@@ -198,7 +198,7 @@
           "name": "appsettings",
           "type": "config",
           "dependsOn": [
-            "[concat('Microsoft.Web/Sites/', variables('deploySiteName'))]",
+            "[resourceId('Microsoft.Web/Sites/', variables('deploySiteName'))]",
             "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageName'))]"
           ],
           "properties": {
@@ -220,7 +220,7 @@
           "name": "web",
           "type": "sourcecontrols",
           "dependsOn": [
-            "[concat('Microsoft.Web/Sites/', variables('deploySiteName'))]",
+            "[resourceId('Microsoft.Web/Sites/', variables('deploySiteName'))]",
             "[concat('Microsoft.Web/Sites/', variables('deploySiteName'), '/config/web')]"
           ],
           "properties": {
