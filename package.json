@@ -16,6 +16,7 @@
     "async": "^1.5.2",
     "azure-storage": "^0.8.0",
     "bluebird": "^3.2.2",
+    "body-parser": "^1.14.2",
     "express": "^4.13.4",
     "morgan": "^1.6.1",
     "nconf": "^0.8.4",
