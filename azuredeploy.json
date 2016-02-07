@@ -125,6 +125,12 @@
         "description": "The Slack token of your slash command."
       }
     },
+    "SLACK_CHANNEL" : {
+      "type": "string",
+      "metadata": {
+        "description": "The Slack channel to which updates of the run will be posted."
+      }
+    },
     "SLACK_INCOMING_WEBHOOK_URL" : {
       "type": "string",
       "metadata": {
@@ -187,6 +193,7 @@
             { "Name": "STORAGE_ACCOUNT", "Value": "[parameters('storageName')]" },
             { "Name": "STORAGE_ACCOUNT_KEY", "Value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageName')), '2015-06-15').key1]" },
             { "Name": "SLACK_TOKEN", "Value": "[parameters('SLACK_TOKEN')]" },
+            { "Name": "SLACK_CHANNEL", "Value": "[parameters('SLACK_CHANNEL')]" },
             { "Name": "SLACK_INCOMING_WEBHOOK_URL", "Value": "[parameters('SLACK_INCOMING_WEBHOOK_URL')]" },
             { "Name": "WEBSITE_NODE_DEFAULT_VERSION", "Value": "5.3.0" }
           ]

@@ -29,8 +29,10 @@ const armClient = ArmClient({
 });
 
 // Slack client.
-const slack = new Slack(nconf.get('SLACK_INCOMING_WEBHOOK_URL'));
-  
+const slack = new Slack(nconf.get('SLACK_INCOMING_WEBHOOK_URL'), {
+  channel: nconf.get('SLACK_CHANNEL')
+});
+
 // Queue.
 const queue = Queue(nconf.get('STORAGE_ACCOUNT'), nconf.get('STORAGE_ACCOUNT_KEY'), 'azure-runslash-jobs');
 
