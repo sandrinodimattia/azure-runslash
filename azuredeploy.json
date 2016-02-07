@@ -20,24 +20,27 @@
         "description": "Name of the Location (eg: West Europe)"
       }
     },
-    "sku": {
-      "type": "string",
-      "defaultValue": "Free",
+    "svcPlanSize": {
       "allowedValues": [
-          "Free",
-          "Basic",
-          "Standard",
-          "Premium"
+        "B1",
+        "S1"
       ],
+      "defaultValue": "S1",
+      "type": "string",
       "metadata": {
-          "description": "The pricing tier for the App Service plan."
+          "description": "The instance size of the App Service."
       }
     },
-    "svcPlanSize": {
-      "defaultValue": "F1",
+    "workerSize": {
       "type": "string",
+      "allowedValues": [
+          "0",
+          "1",
+          "2"
+      ],
+      "defaultValue": "0",
       "metadata": {
-          "description": "The instance size of the app."
+        "description": "The VM size (Small/Medium/Large)"
       }
     },
     "storageName":{
@@ -151,27 +154,13 @@
       "type": "Microsoft.Web/sites",
       "location": "[parameters('siteLocation')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
-        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageName'))]"
+        "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]"
       ],
       "properties": {
         "name": "[variables('deploySiteName')]",
         "serverFarmId": "[parameters('appServicePlanName')]"
       },
       "resources": [
-        {
-          "apiVersion": "2015-08-01",
-          "name": "web",
-          "type": "sourcecontrols",
-          "dependsOn": [
-            "[resourceId('Microsoft.Web/Sites', variables('deploySiteName'))]"
-          ],
-          "properties": {
-            "RepoUrl": "[parameters('repoURL')]",
-            "branch": "[parameters('branch')]",
-            "IsManualIntegration": true
-          }
-        },
         {
           "apiVersion": "2015-08-01",
           "name":"web",
@@ -191,7 +180,8 @@
           "name": "appsettings",
           "type": "config",
           "dependsOn": [
-            "[resourceId('Microsoft.Web/Sites', variables('deploySiteName'))]"
+            "[resourceId('Microsoft.Web/Sites', variables('deploySiteName'))]",
+            "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageName'))]"
           ],
           "properties": {
             "SUBSCRIPTION_ID": "[parameters('SUBSCRIPTION_ID')]",
@@ -206,8 +196,28 @@
             "SLACK_INCOMING_WEBHOOK_URL": "[parameters('SLACK_INCOMING_WEBHOOK_URL')]",
             "WEBSITE_NODE_DEFAULT_VERSION": "5.3.0"
           }
+        },
+        {
+          "apiVersion": "2015-08-01",
+          "name": "web",
+          "type": "sourcecontrols",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/Sites', variables('deploySiteName'))]",
+            "[concat('Microsoft.Web/Sites/', variables('deploySiteNam'), '/config/web')]"
+          ],
+          "properties": {
+            "RepoUrl": "[parameters('repoURL')]",
+            "branch": "[parameters('branch')]",
+            "IsManualIntegration": true
+          }
         }
       ]
     }
-  ]
+  ],
+  "outputs": {
+     "siteUri": {
+       "type": "string",
+       "value": "[concat('https://',reference(resourceId('Microsoft.Web/sites', variables('deploySiteName'))).hostNames[0])]"
+     }
+  }
 }
