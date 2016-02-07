@@ -20,6 +20,19 @@
         "description": "Name of the Location (eg: West Europe)"
       }
     },
+    "sku": {
+      "type": "string",
+      "defaultValue": "Free",
+      "allowedValues": [
+          "Free",
+          "Basic",
+          "Standard",
+          "Premium"
+      ],
+      "metadata": {
+          "description": "The pricing tier for the App Service plan."
+      }
+    },
     "svcPlanSize": {
       "allowedValues": [
         "B1",
@@ -141,7 +154,12 @@
       "apiVersion": "2015-08-01",
       "name": "[parameters('appServicePlanName')]",
       "type": "Microsoft.Web/serverfarms",
-      "location": "[parameters('siteLocation')]",        
+      "location": "[parameters('siteLocation')]",
+      "properties": {
+        "name": "[variables('hostPlan')]",
+        "numberOfWorkers": 1,
+        "workerSize": 0
+      },    
       "sku": {
         "name": "[parameters('svcPlanSize')]",
         "tier": "[parameters('sku')]",
