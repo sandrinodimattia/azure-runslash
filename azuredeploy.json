@@ -156,7 +156,7 @@
       "type": "Microsoft.Web/serverfarms",
       "location": "[parameters('siteLocation')]",
       "properties": {
-        "name": "[variables('hostPlan')]",
+        "name": "[parameters('appServicePlanName')]",
         "numberOfWorkers": 1,
         "workerSize": 0
       },    
@@ -221,7 +221,7 @@
           "type": "sourcecontrols",
           "dependsOn": [
             "[resourceId('Microsoft.Web/Sites', variables('deploySiteName'))]",
-            "[concat('Microsoft.Web/Sites/', variables('deploySiteNam'), '/config/web')]"
+            "[concat('Microsoft.Web/Sites/', variables('deploySiteName'), '/config/web')]"
           ],
           "properties": {
             "RepoUrl": "[parameters('repoURL')]",
