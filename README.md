@@ -14,7 +14,7 @@ Well the Slash command will just forward the request to a Web App. This Web App 
 
 A Web Job will then empty the queue and post a message to Slack each time the status of the job changes.
 
-![How does this work?](http://fabriccontroller.net/static/static/chatops-how-this-works.png)
+![How does this work?](http://fabriccontroller.net/static/chatops-how-this-works.png)
 
 ## Configuration
 
